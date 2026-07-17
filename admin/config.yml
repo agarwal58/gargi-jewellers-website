@@ -1,5 +1,6 @@
 backend:
-  name: git-gateway
+  name: github
+  repo: agarwal58/gargi-jewellers-website
   branch: main
 
 media_folder: "images"
