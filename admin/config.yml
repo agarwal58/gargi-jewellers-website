@@ -1,0 +1,19 @@
+backend:
+  name: github
+  repo: agarwal58/gargi-jewellers-website
+  branch: main
+  base_url: https://api.decapcms.org
+
+media_folder: "images/gallery"
+public_folder: "/images/gallery"
+
+collections:
+  - name: "gallery"
+    label: "Gallery Items"
+    folder: "data/gallery"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Category", name: "category", widget: "select", options: ["all", "frames", "jewellery", "gallery"]}
+      - {label: "Product Image", name: "image", widget: "image"}
