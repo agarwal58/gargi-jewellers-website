@@ -2,7 +2,8 @@ backend:
   name: github
   repo: agarwal58/gargi-jewellers-website
   branch: main
-  base_url: https://api.decapcms.org
+  base_url: https://api.netlify.com
+  site_domain: gargi-jewellers.netlify.app
 
 media_folder: "images/gallery"
 public_folder: "/images/gallery"
