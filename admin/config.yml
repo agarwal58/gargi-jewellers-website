@@ -1,0 +1,49 @@
+backend:
+  name: github
+  repo: agarwal58/gargi-jewellers-website
+  branch: main
+  base_url: https://api.decapcms.org
+
+media_folder: "images/gallery"
+public_folder: "/images/gallery"
+
+collections:
+  - name: "gallery"
+    label: "Gallery Photos"
+    label_singular: "Gallery Photo"
+    folder: "data/gallery"
+    extension: "json"
+    format: "json"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string", hint: "e.g. Gold Bangles, Radha-Krishna Frame" }
+      - { label: "Category", name: "category", widget: "select", options: ["frames", "jewellery"], hint: "frames = Divine Frames album, jewellery = Jewellery album" }
+      - { label: "Image", name: "image", widget: "image", hint: "Please upload JPG or PNG photos (avoid HEIC if possible)" }
+
+  - name: "settings"
+    label: "Site Settings"
+    files:
+      - name: "announcement"
+        label: "Announcement / Offer Banner"
+        file: "data/announcement.json"
+        fields:
+          - { label: "Show banner on website?", name: "enabled", widget: "boolean", default: false, hint: "Turn ON to display the banner at the top of the site, OFF to hide it" }
+          - { label: "Banner text", name: "text", widget: "string", hint: "e.g. Diwali Special - New collection of silver frames now in stock!" }
+          - { label: "Link (optional)", name: "link", widget: "string", required: false, hint: "Leave empty, or paste a link (e.g. https://wa.me/919425339098)" }
+
+  - name: "team"
+    label: "Meet Us (People)"
+    label_singular: "Person"
+    folder: "data/team"
+    extension: "json"
+    format: "json"
+    create: true
+    slug: "{{slug}}"
+    media_folder: "/images/team"
+    public_folder: "/images/team"
+    fields:
+      - { label: "Name", name: "name", widget: "string" }
+      - { label: "Role", name: "role", widget: "string", required: false, hint: "e.g. Owner, Partner, Manager" }
+      - { label: "Mobile Number", name: "phone", widget: "string", hint: "10-digit mobile, e.g. 94253 39098 - Call & WhatsApp buttons are created automatically" }
+      - { label: "Photo", name: "photo", widget: "image", required: false, hint: "JPG/PNG photo of the person. Leave empty to show their initial instead." }
