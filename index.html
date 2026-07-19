@@ -380,6 +380,15 @@
   }
   .about-art.has-photo svg{display:none;}
   .about-art.has-photo img.about-photo{display:block;}
+  .about-art.has-photo{flex-direction:column;}
+  .about-caption{
+    display:none; margin-top:14px; text-align:center; font-family:var(--serif-head);
+    color:var(--gold-light); font-size:1.05rem; max-width:340px;
+  }
+  .about-caption small{
+    display:block; font-family:var(--sans-ui); font-size:.8rem; color:#F5E6C4;
+    opacity:.85; margin-top:4px; letter-spacing:.04em;
+  }
   #lightbox-caption{
     display:none; margin-top:14px; text-align:center; font-family:var(--serif-head);
     color:var(--gold-light); font-size:1.05rem;
@@ -668,6 +677,7 @@
     </div>
     <div class="about-art" id="about-art">
       <img class="about-photo" id="about-photo" alt="Gargi Jewellers" loading="lazy">
+      <div class="about-caption" id="about-caption"></div>
       <svg viewBox="0 0 300 340" xmlns="http://www.w3.org/2000/svg">
         <rect x="14" y="14" width="272" height="312" rx="4" fill="none" stroke="#C9972E" stroke-width="3"/>
         <rect x="28" y="28" width="244" height="284" rx="2" fill="none" stroke="#E9CD84" stroke-width="1.2"/>
@@ -1019,6 +1029,19 @@
         img.src = photoUrl;
       }
       art.classList.add('has-photo');
+
+      // Caption: item name + size / MRP (all optional, set in admin)
+      const cap = document.getElementById('about-caption');
+      if (cap) {
+        const t = a.title || '';
+        const meta = [a.size, a.price].filter(Boolean).join('  \u2022  ');
+        if (t || meta) {
+          cap.innerHTML = '';
+          if (t) cap.appendChild(document.createTextNode(t));
+          if (meta) { const s = document.createElement('small'); s.textContent = meta; cap.appendChild(s); }
+          cap.style.display = 'block';
+        }
+      }
     } catch (e) { /* photo is optional */ }
   }
   window.addEventListener('DOMContentLoaded', loadAboutPhoto);

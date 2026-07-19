@@ -40,6 +40,9 @@ collections:
         file: "data/about.json"
         fields:
           - { label: "Photo", name: "photo", widget: "image", required: false, media_folder: "/images/about", public_folder: "/images/about", hint: "Shown in the Our Story section instead of the gold design. Change it whenever you like - remove it to bring the design back." }
+          - { label: "Item name (optional)", name: "title", widget: "string", required: false, hint: "e.g. Silver Radha-Krishna Frame - shown under the photo" }
+          - { label: "Size (optional)", name: "size", widget: "string", required: false, hint: "e.g. 12 x 18 inch" }
+          - { label: "MRP / Price (optional)", name: "price", widget: "string", required: false, hint: "e.g. Rs. 2,500 - leave empty to show no price" }
 
   - name: "team"
     label: "Meet Us (People)"
