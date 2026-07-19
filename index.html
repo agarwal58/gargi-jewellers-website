@@ -394,6 +394,22 @@
     color:var(--gold-light); font-size:1.05rem;
   }
   #lightbox-caption small{display:block; font-family:var(--sans-ui); font-size:.8rem; color:#F5E6C4; opacity:.85; margin-top:4px; letter-spacing:.04em;}
+  #lightbox-order{display:none; margin-top:16px; text-align:center;}
+  #lightbox-order .order-label{
+    display:block; font-family:var(--sans-ui); font-size:.72rem; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--gold-pale); opacity:.8; margin-bottom:10px;
+  }
+  .wa-order-btn{
+    display:inline-block; margin:0 6px 8px; padding:10px 22px; border-radius:999px;
+    background:#1FA855; color:#fff; font-family:var(--sans-ui); font-size:.9rem;
+    text-decoration:none; letter-spacing:.02em;
+    border:1px solid rgba(255,255,255,.25); transition:transform .15s, filter .15s;
+  }
+  .wa-order-btn:hover{transform:translateY(-1px); filter:brightness(1.08);}
+  .order-hint{
+    text-align:center; margin-top:14px; font-family:var(--sans-ui); font-size:.78rem;
+    color:var(--gold-pale); opacity:.75; letter-spacing:.03em;
+  }
   .photo-slot.has-photo{border-style:solid;}
   .photo-slot.has-photo img{display:block;}
   .photo-slot.has-photo .slot-placeholder{display:none;}
@@ -771,6 +787,7 @@
     <div class="album-panel" id="frames-album">
       <div class="photo-grid"><!-- photos load from the admin panel --></div>
       <p class="gallery-note" id="frames-album-note">New frame photos are being added &mdash; WhatsApp us to see the latest collection.</p>
+      <p class="order-hint">Tap any photo to see details &amp; order on WhatsApp</p>
     </div>
 
     <!-- ALBUM: JEWELLERY -->
@@ -778,6 +795,7 @@
     <div class="album-panel" id="jewellery-album">
       <div class="photo-grid"><!-- photos load from the admin panel --></div>
       <p class="gallery-note" id="jewellery-album-note">New jewellery photos are being added &mdash; WhatsApp us to see the latest collection.</p>
+      <p class="order-hint">Tap any photo to see details &amp; order on WhatsApp</p>
     </div>
   </div>
 
@@ -917,6 +935,7 @@
   <div style="text-align:center;">
     <img id="lightbox-img" alt="Gallery photo">
     <div id="lightbox-caption"></div>
+    <div id="lightbox-order"></div>
   </div>
 </div>
 
@@ -938,6 +957,34 @@
       cap.style.display = 'block';
     } else {
       cap.style.display = 'none';
+    }
+    // Order on WhatsApp buttons (gallery items only)
+    const orderBox = document.getElementById('lightbox-order');
+    if (orderBox) {
+      orderBox.innerHTML = '';
+      if (t) {
+        const msg = 'Namaste! I would like to order this item from gargijewellers.in:\n' + t + (m ? ' (' + m + ')' : '');
+        const label = document.createElement('span');
+        label.className = 'order-label';
+        label.textContent = 'Order on WhatsApp';
+        orderBox.appendChild(label);
+        const owners = [
+          { name: 'Bhanu Pratap ji', num: '919425339098' },
+          { name: 'Ravi Pratap ji', num: '919425122341' }
+        ];
+        for (const o of owners) {
+          const a = document.createElement('a');
+          a.className = 'wa-order-btn';
+          a.href = 'https://wa.me/' + o.num + '?text=' + encodeURIComponent(msg);
+          a.target = '_blank';
+          a.rel = 'noopener';
+          a.textContent = 'Message ' + o.name;
+          orderBox.appendChild(a);
+        }
+        orderBox.style.display = 'block';
+      } else {
+        orderBox.style.display = 'none';
+      }
     }
     document.getElementById('lightbox').classList.add('open');
   }
