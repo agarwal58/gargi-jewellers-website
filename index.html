@@ -361,6 +361,30 @@
   }
   .photo-slot:hover{border-color:var(--gold); transform:translateY(-3px);}
   .photo-slot img{width:100%; height:100%; object-fit:cover; display:none;}
+  /* Frames album: taller blocks + full photo visible (no cropping) */
+  #frames-album .photo-slot{aspect-ratio:3/4;}
+  #frames-album .photo-slot img{object-fit:contain; background:#2E070D;}
+  /* Caption bar for title / size / price on gallery tiles */
+  .slot-caption{
+    position:absolute; left:0; right:0; bottom:0; z-index:2;
+    background:linear-gradient(transparent, rgba(18,3,6,.88) 45%);
+    padding:26px 12px 10px; text-align:left; pointer-events:none;
+  }
+  .cap-title{font-family:var(--serif-head); font-size:.95rem; color:var(--gold-light); line-height:1.25;}
+  .cap-meta{font-family:var(--sans-ui); font-size:.72rem; letter-spacing:.04em; color:#F5E6C4; opacity:.9; margin-top:3px;}
+  /* About section: real photo (from admin) replaces the gold artwork */
+  .about-art img.about-photo{
+    display:none; width:100%; max-width:340px; border-radius:4px;
+    border:3px solid var(--gold); outline:1px solid var(--gold-light); outline-offset:-12px;
+    box-shadow:0 10px 40px rgba(0,0,0,.45);
+  }
+  .about-art.has-photo svg{display:none;}
+  .about-art.has-photo img.about-photo{display:block;}
+  #lightbox-caption{
+    display:none; margin-top:14px; text-align:center; font-family:var(--serif-head);
+    color:var(--gold-light); font-size:1.05rem;
+  }
+  #lightbox-caption small{display:block; font-family:var(--sans-ui); font-size:.8rem; color:#F5E6C4; opacity:.85; margin-top:4px; letter-spacing:.04em;}
   .photo-slot.has-photo{border-style:solid;}
   .photo-slot.has-photo img{display:block;}
   .photo-slot.has-photo .slot-placeholder{display:none;}
@@ -642,7 +666,8 @@
       <p>We believe divinity has many faces. Alongside our gold and silver jewellery, we hand-finish frames of gods and goddesses from every tradition — because every home's altar deserves the same craftsmanship, whichever faith it honours.</p>
       <p class="signoff">Maa Kali Kripa — every piece leaves our workshop with a blessing.</p>
     </div>
-    <div class="about-art">
+    <div class="about-art" id="about-art">
+      <img class="about-photo" id="about-photo" alt="Gargi Jewellers" loading="lazy">
       <svg viewBox="0 0 300 340" xmlns="http://www.w3.org/2000/svg">
         <rect x="14" y="14" width="272" height="312" rx="4" fill="none" stroke="#C9972E" stroke-width="3"/>
         <rect x="28" y="28" width="244" height="284" rx="2" fill="none" stroke="#E9CD84" stroke-width="1.2"/>
@@ -829,7 +854,7 @@
       <p class="enquiry-lead">Fill this in and we'll get back to you — or just call/WhatsApp us directly above.</p>
       <form id="enquiry-form" method="POST">
         <!-- Web3Forms: replace the value below with your real access key from https://web3forms.com -->
-        <input type="hidden" name="access_key" value="0eecb058-6c9e-43ae-86af-8466c8989964" />
+        <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_ACCESS_KEY" />
         <input type="hidden" name="subject" value="New enquiry from gargijewellers.in" />
         <input type="hidden" name="from_name" value="Gargi Jewellers Website" />
         <input type="checkbox" name="botcheck" style="display:none;" tabindex="-1" autocomplete="off" />
@@ -876,6 +901,15 @@
   <svg viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.1-1.6-.8-1.9-.9-.3-.1-.4-.1-.6.1-.2.3-.7.9-.8 1-.1.2-.3.2-.6.1-.3-.1-1.2-.4-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.3-.4.1-.2 0-.4 0-.5 0-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1.1 2.7c.1.2 1.8 2.8 4.5 3.9.6.3 1.1.4 1.5.5.6.2 1.2.2 1.6.1.5-.1 1.6-.6 1.8-1.3.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.6-.3z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.7 1.5 5.3L2 22l4.8-1.5c1.5.8 3.3 1.3 5.2 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.2c-1.7 0-3.4-.5-4.8-1.3l-.3-.2-3.2 1 .9-3.1-.2-.3C3.5 15 3 13.5 3 12c0-5 4-9 9-9s9 4 9 9-4 9-9 9.2z"/></svg>
 </a>
 
+<!-- Lightbox photo viewer (restored) -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="closeLightbox()" aria-label="Close">&times;</button>
+  <div style="text-align:center;">
+    <img id="lightbox-img" alt="Gallery photo">
+    <div id="lightbox-caption"></div>
+  </div>
+</div>
+
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
 
@@ -884,6 +918,17 @@
     if(!slot.classList.contains('has-photo')) return;
     const src = slot.querySelector('img').src;
     document.getElementById('lightbox-img').src = src;
+    const cap = document.getElementById('lightbox-caption');
+    const t = slot.dataset.title || '';
+    const m = slot.dataset.meta || '';
+    if (t || m) {
+      cap.innerHTML = '';
+      if (t) cap.appendChild(document.createTextNode(t));
+      if (m) { const s = document.createElement('small'); s.textContent = m; cap.appendChild(s); }
+      cap.style.display = 'block';
+    } else {
+      cap.style.display = 'none';
+    }
     document.getElementById('lightbox').classList.add('open');
   }
   function closeLightbox(){
@@ -950,6 +995,34 @@
   }
   window.addEventListener('DOMContentLoaded', loadAnnouncement);
 
+  // ===== About section photo (managed via /admin -> Site Settings) =====
+  async function loadAboutPhoto() {
+    try {
+      const res = await fetch('data/about.json?v=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) return;
+      const a = await res.json();
+      let photoUrl = a.photo || '';
+      if (!photoUrl) return;
+      if (!photoUrl.startsWith('http') && !photoUrl.startsWith('/')) {
+        photoUrl = '/images/about/' + photoUrl;
+      }
+      const img = document.getElementById('about-photo');
+      const art = document.getElementById('about-art');
+      if (!img || !art) return;
+      if (/\.heic$/i.test(photoUrl) && typeof heic2any === 'function') {
+        try {
+          const blob = await (await fetch(photoUrl)).blob();
+          const jpeg = await heic2any({ blob: blob, toType: 'image/jpeg', quality: 0.85 });
+          img.src = URL.createObjectURL(Array.isArray(jpeg) ? jpeg[0] : jpeg);
+        } catch (e) { return; }
+      } else {
+        img.src = photoUrl;
+      }
+      art.classList.add('has-photo');
+    } catch (e) { /* photo is optional */ }
+  }
+  window.addEventListener('DOMContentLoaded', loadAboutPhoto);
+
   // ===== Gallery: loads every entry committed by the admin panel (data/gallery/*) =====
   async function loadGalleryFromCMS() {
     const owner = 'agarwal58';
@@ -973,11 +1046,14 @@
           let itemCategory = 'frames';
           let imageUrl = '';
 
+          let price = '', size = '';
           if (file.name.endsWith('.json')) {
             const item = await itemResponse.json();
             title = item.title || title;
             itemCategory = (item.category || 'frames').toLowerCase();
             imageUrl = item.image || '';
+            price = item.price || '';
+            size = item.size || '';
           } else {
             // Older .md entries with YAML front matter (title: X / category: Y / image: Z)
             const text = await itemResponse.text();
@@ -1027,6 +1103,26 @@
           slot.setAttribute('data-category', itemCategory);
           slot.setAttribute('onclick', 'openLightbox(this)');
           slot.appendChild(img);
+
+          // Caption: title + size / price (shown on tile and in the popup)
+          const meta = [size, price].filter(Boolean).join('  \u2022  ');
+          slot.dataset.title = title;
+          slot.dataset.meta = meta;
+          if (title || meta) {
+            const capEl = document.createElement('div');
+            capEl.className = 'slot-caption';
+            const t = document.createElement('div');
+            t.className = 'cap-title';
+            t.textContent = title;
+            capEl.appendChild(t);
+            if (meta) {
+              const mm = document.createElement('div');
+              mm.className = 'cap-meta';
+              mm.textContent = meta;
+              capEl.appendChild(mm);
+            }
+            slot.appendChild(capEl);
+          }
           targetGrid.appendChild(slot);
           const note = document.getElementById(itemCategory === 'jewellery' ? 'jewellery-album-note' : 'frames-album-note');
           if (note) note.style.display = 'none';
@@ -1050,14 +1146,29 @@
       const grid = document.getElementById('team-grid');
       if (!grid) return;
 
+      // Phase 1: fetch every entry
+      const people = [];
       for (const file of files) {
         if (!file.name.endsWith('.json')) continue;
         try {
           const res = await fetch(file.download_url);
           if (!res.ok) continue;
           const person = await res.json();
-          if (!person.name) continue;
+          if (person.name) people.push(person);
+        } catch (e) { console.error('Skipping team entry:', file.name, e); }
+      }
 
+      // Phase 2: sort by Display Order (lower = first), then by name
+      people.sort(function (a, b) {
+        const oa = (typeof a.order === 'number') ? a.order : parseInt(a.order, 10) || 999;
+        const ob = (typeof b.order === 'number') ? b.order : parseInt(b.order, 10) || 999;
+        if (oa !== ob) return oa - ob;
+        return String(a.name).localeCompare(String(b.name));
+      });
+
+      // Phase 3: build a card per person, in order
+      for (const person of people) {
+        try {
           const card = document.createElement('div');
           card.className = 'team-card';
 
@@ -1082,7 +1193,6 @@
             if (photoUrl) card.appendChild(img);
           }
           if (!photoUrl) {
-            // No photo yet: show a gold circle with the person's initial
             const init = document.createElement('div');
             init.className = 'team-initial';
             init.textContent = person.name.trim().charAt(0).toUpperCase();
@@ -1129,7 +1239,7 @@
 
           grid.appendChild(card);
         } catch (itemError) {
-          console.error('Skipping team entry:', file.name, itemError);
+          console.error('Skipping person card:', person && person.name, itemError);
         }
       }
     } catch (error) {
